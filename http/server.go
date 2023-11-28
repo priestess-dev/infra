@@ -7,11 +7,17 @@ import (
 
 type RouteHandler gin.HandlerFunc
 
+type EndpointConfig struct {
+	Path    string          `json:"path"`    // path to endpoint
+	Method  string          `json:"method"`  // http method
+	Handler gin.HandlerFunc `json:"handler"` // handler
+}
+
 type Server struct {
-	Host     string
-	Port     int
-	RouteMap map[string]gin.HandlerFunc
-	router   *gin.Engine
+	Host   string
+	Port   int
+	Routes []EndpointConfig
+	router *gin.Engine
 }
 
 func NewServer(host string, port int) *Server {
@@ -21,29 +27,25 @@ func NewServer(host string, port int) *Server {
 	}
 }
 
-func (s *Server) AddRoutes(routeMap map[string]gin.HandlerFunc) {
-	if s.RouteMap == nil {
-		s.RouteMap = make(map[string]gin.HandlerFunc)
+func (s *Server) AddRoutes(routes ...EndpointConfig) {
+	if s.Routes == nil {
+		s.Routes = make([]EndpointConfig, 0)
 	}
-	for path, handler := range routeMap {
-		s.RouteMap[path] = handler
-	}
+	s.Routes = append(s.Routes, routes...)
 }
 
-func (s *Server) AddRoute(path string, handler gin.HandlerFunc) {
-	if s.RouteMap == nil {
-		s.RouteMap = make(map[string]gin.HandlerFunc)
-	}
-	s.RouteMap[path] = handler
+func (s *Server) AddRoute(config EndpointConfig) {
+	s.AddRoutes(config)
 }
 
 func (s *Server) Start() error {
 	s.router = gin.Default()
-	if s.RouteMap == nil {
-		return fmt.Errorf("route map is nil")
-	}
-	for path, handler := range s.RouteMap {
-		s.router.GET(path, handler)
+	if s.Routes != nil {
+		for _, route := range s.Routes {
+			s.router.Handle(route.Method, route.Path, route.Handler)
+		}
+	} else {
+		return fmt.Errorf("no routes")
 	}
 	return s.router.Run(fmt.Sprintf("%s:%d", s.Host, s.Port))
 }

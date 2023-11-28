@@ -18,6 +18,10 @@ const (
 	ContentTypeMultipartForm ContentTypeEnum = "multipart/form-data"
 )
 
+func (c ContentTypeEnum) String() string {
+	return string(c)
+}
+
 // EmptyRequest is a empty request
 type EmptyRequest struct{}
 
@@ -57,17 +61,37 @@ func MultipartFormRequestProcessor[ReqT interface{}](r *http.Request, raw ReqT, 
 	for i := 0; i < reqVal.NumField(); i++ {
 		field := reqVal.Field(i)
 		if field.IsValid() {
-			// if is io.Reader, then add to multipart
 			if field.Type().Implements(reflect.TypeOf((*io.Reader)(nil)).Elem()) {
+				// if the field is io.Reader, then add to multipart
 				part, err := writer.CreateFormFile(reqVal.Type().Field(i).Tag.Get("json"), fileName)
 				if err != nil {
 					return err
 				}
+				//switch t := field.Interface().(type) {
+				//case *os.File:
+				//	_, err := io.Copy(part, t)
+				//	if err != nil {
+				//		return err
+				//	}
+				//case *bytes.Buffer:
+				//	_, err := io.Copy(part, t)
+				//	if err != nil {
+				//		return err
+				//	}
+				//case io.Reader:
+				//	_, err := io.Copy(part, t)
+				//	if err != nil {
+				//		return err
+				//	}
+				//default:
+				//	return fmt.Errorf("unsupported type: %s", field.Type().String())
+				//}
 				_, err = io.Copy(part, field.Interface().(io.Reader))
 				if err != nil {
 					return err
 				}
 			} else {
+				// else add to multipart form as key - value
 				err := writer.WriteField(reqVal.Type().Field(i).Tag.Get("json"), fmt.Sprintf("%v", field.Interface()))
 				if err != nil {
 					return err
@@ -79,6 +103,8 @@ func MultipartFormRequestProcessor[ReqT interface{}](r *http.Request, raw ReqT, 
 	if err != nil {
 		return err
 	}
+	r.Body = io.NopCloser(body)
+	r.Header.Set("Content-Type", writer.FormDataContentType())
 	return nil
 }
 
@@ -102,6 +128,7 @@ func EndpointHandler[ReqT, RespT interface{}](client *http.Client, url string, m
 			case http.MethodGet:
 				URLQueryProcessor(httpReq, req)
 			case http.MethodPost:
+				fallthrough
 			case http.MethodPatch:
 				err = JSONProcessor(httpReq, req)
 				if err != nil {
@@ -110,10 +137,6 @@ func EndpointHandler[ReqT, RespT interface{}](client *http.Client, url string, m
 			default:
 				return respObj, fmt.Errorf("unsupported method: %s", method)
 			}
-		}
-
-		if err != nil {
-			return respObj, err
 		}
 		for k, v := range headers {
 			httpReq.Header.Add(k, v)
