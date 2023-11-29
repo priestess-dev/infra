@@ -11,8 +11,7 @@ type EndpointEnum string
 
 const (
 	EndpointGetUser        EndpointEnum = "https://api.github.com/user"
-	EndpointListUsers      EndpointEnum = "ListUsers"
-	EndpointCreateUser     EndpointEnum = "CreateUser"
+	EndpointListUsers      EndpointEnum = "https://api.github.com/users"
 	EndpointListUserEvents EndpointEnum = "https://api.github.com/users/:user/events/public"
 )
 
