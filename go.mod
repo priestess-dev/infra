@@ -1,4 +1,4 @@
-module github.com/priestess-dev/infra
+module github.com/priestess-dev/infra/v1
 
 go 1.20
 
