@@ -33,5 +33,5 @@ A collection of tools and scripts to manage the infrastructure of the Priestess 
 ## 📦 Install
 
 ```bash
-go get github.com/priestess/priestess-infrastructure
+go get github.com/priestess-dev/infra/v1
 ```
