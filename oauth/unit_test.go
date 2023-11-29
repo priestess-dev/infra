@@ -18,10 +18,10 @@ func getClientConfig() *Config {
 
 func TestGithubHandler(t *testing.T) {
 	// create server
-	server := ih.Server{
-		Host: "127.0.0.1",
-		Port: 8000,
-	}
+	server := ih.NewServer(
+		"127.0.0.1",
+		8000,
+	)
 	// create github handler
 	config := getClientConfig()
 	t.Logf("config: %+v", config)
