@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/priestess-dev/infra/utils/random"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestGetJsonTag(t *testing.T) {
@@ -75,6 +77,10 @@ func TestJSONProcessor(t *testing.T) {
 
 func TestEndpointHandler(t *testing.T) {
 	var FILE_STRING = "content of some file"
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
 	// start server
 	go func() {
 		type R struct {
@@ -147,6 +153,10 @@ func TestEndpointHandler(t *testing.T) {
 			return
 		}
 	}()
+	select {
+	case <-ctx.Done():
+		t.Log("server might started")
+	}
 	t.Run("GET", func(t *testing.T) {
 		type ReqType struct {
 			Test string `json:"test"`
