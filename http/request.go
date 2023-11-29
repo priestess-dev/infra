@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/priestess-dev/infra/utils/misc"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -39,7 +40,10 @@ func URLQueryProcessor[ReqT interface{}](r *http.Request, raw ReqT) {
 		field := reqVal.Field(i)
 		if field.IsValid() {
 			// todo: unsafe if field is nested struct
-			query.Add(reqVal.Type().Field(i).Tag.Get("json"), fmt.Sprintf("%v", field.Interface()))
+			fn := misc.GetJsonName(reqVal.Type().Field(i).Tag.Get("json"), reqVal.Type().Field(i).Name)
+			if fn != "" {
+				query.Add(fn, fmt.Sprintf("%v", field.Interface()))
+			}
 		}
 	}
 	r.URL.RawQuery = query.Encode()
@@ -63,7 +67,7 @@ func MultipartFormRequestProcessor[ReqT interface{}](r *http.Request, raw ReqT, 
 		if field.IsValid() {
 			if field.Type().Implements(reflect.TypeOf((*io.Reader)(nil)).Elem()) {
 				// if the field is io.Reader, then add to multipart
-				part, err := writer.CreateFormFile(reqVal.Type().Field(i).Tag.Get("json"), fileName)
+				part, err := writer.CreateFormFile(misc.GetJsonName(reqVal.Type().Field(i).Tag.Get("json"), reqVal.Type().Field(i).Name), fileName)
 				if err != nil {
 					return err
 				}
@@ -141,6 +145,7 @@ func EndpointHandler[ReqT, RespT interface{}](client *http.Client, url string, m
 		for k, v := range headers {
 			httpReq.Header.Add(k, v)
 		}
+		fmt.Printf("[%s] to %s\n", httpReq.Method, httpReq.URL.String())
 		resp, err := client.Do(httpReq)
 		if err != nil {
 			return respObj, err

@@ -6,8 +6,26 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"reflect"
 	"testing"
 )
+
+func TestGetJsonTag(t *testing.T) {
+	type Test struct {
+		Test string `json:"test1,omitempty"`
+	}
+	tt := Test{
+		Test: "test",
+	}
+	ttVal := reflect.ValueOf(tt)
+	for i := 0; i < ttVal.NumField(); i++ {
+		field := ttVal.Type().Field(i)
+		t.Logf("field: %s, get tag: %s, ", field.Name, field.Tag.Get("json"))
+		if tag, ok := field.Tag.Lookup("json"); ok {
+			t.Logf("lookup tag: %s\n", tag)
+		}
+	}
+}
 
 func TestURLQueryProcessor(t *testing.T) {
 	t.Run("Non Empty Req", func(t *testing.T) {
