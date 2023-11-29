@@ -128,12 +128,22 @@ type EventPayload interface {
 	WatchEvent | PushEvent | CreateEvent | PublicEvent | ReleaseEvent
 }
 
-type Event[T EventPayload] struct {
-	ID        string     `json:"id"`         // id
-	Type      string     `json:"type"`       // type of event (e.g. PushEvent)
-	Repo      Repository `json:"repo"`       // repository
-	Actor     User       `json:"actor"`      // actor
-	Payload   T          `json:"payload"`    // payload
-	Public    bool       `json:"public"`     // public
-	CreatedAt time.Time  `json:"created_at"` // created at
+type Event struct {
+	ID        string      `json:"id"`         // id
+	Type      string      `json:"type"`       // type of event (e.g. PushEvent)
+	Repo      Repository  `json:"repo"`       // repository
+	Actor     User        `json:"actor"`      // actor
+	Payload   interface{} `json:"payload"`    // payload
+	Public    bool        `json:"public"`     // public
+	CreatedAt time.Time   `json:"created_at"` // created at
 }
+
+// GetUserEventsRequest is the request of get events, the username will replace the placeholder in url
+type GetUserEventsRequest struct {
+	Username string `json:"-"`                  // username
+	PerPage  int    `json:"per_page,omitempty"` // results per page (max 100), default 30
+	Page     int    `json:"page,omitempty"`     // page
+}
+
+// GetUserEventsResponse is the response of get events
+type GetUserEventsResponse []Event
