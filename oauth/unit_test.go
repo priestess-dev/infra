@@ -3,7 +3,7 @@
 package oauth
 
 import (
-	ih "github.com/priestess-dev/infra/v1/http"
+	ih "github.com/priestess-dev/infra/http"
 	"net/http"
 	"os"
 	"testing"

@@ -2,7 +2,7 @@ package redis
 
 import (
 	"context"
-	"github.com/priestess-dev/infra/v1/cache"
+	"github.com/priestess-dev/infra/cache"
 	"github.com/redis/go-redis/v9"
 )
 

@@ -1,7 +1,7 @@
 package github
 
 import (
-	ih "github.com/priestess-dev/infra/v1/http"
+	ih "github.com/priestess-dev/infra/http"
 	"golang.org/x/oauth2"
 	"net/http"
 	"strings"

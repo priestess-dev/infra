@@ -3,7 +3,7 @@ package http
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/priestess-dev/infra/v1/utils/random"
+	"github.com/priestess-dev/infra/utils/random"
 	"io"
 	"net/http"
 	"reflect"

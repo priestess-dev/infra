@@ -3,7 +3,7 @@ package oauth
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/priestess-dev/infra/v1/utils/random"
+	"github.com/priestess-dev/infra/utils/random"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 	"io"

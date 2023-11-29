@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/priestess-dev/infra/v1/utils/misc"
+	"github.com/priestess-dev/infra/utils/misc"
 	"io"
 	"mime/multipart"
 	"net/http"
