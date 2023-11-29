@@ -6,10 +6,9 @@ import (
 )
 
 func TestRandString(t *testing.T) {
-	lengths := []int{36}
+	lengths := []int{0, 10, 100, 1001, 1123}
 	for _, length := range lengths {
 		s := RandString(length)
-		println(s)
 		if len(s) != length {
 			t.Errorf("length of random string is not %d, but %d", length, len(s))
 		}

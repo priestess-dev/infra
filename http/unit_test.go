@@ -5,8 +5,8 @@ import (
 	"github.com/priestess-dev/infra/utils/random"
 	"io"
 	"net/http"
-	"os"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -74,6 +74,7 @@ func TestJSONProcessor(t *testing.T) {
 }
 
 func TestEndpointHandler(t *testing.T) {
+	var FILE_STRING = "content of some file"
 	// start server
 	go func() {
 		type R struct {
@@ -132,6 +133,10 @@ func TestEndpointHandler(t *testing.T) {
 				}
 				f.Read(buf)
 				t.Logf("%s\n\n", string(buf))
+				if string(buf) != FILE_STRING {
+					t.Errorf("file content is not equal")
+					return
+				}
 				c.JSON(http.StatusOK, gin.H{
 					"test": random.RandString(10),
 				})
@@ -182,16 +187,18 @@ func TestEndpointHandler(t *testing.T) {
 			Test string `json:"test"`
 		}
 		handler := EndpointHandler[ReqType, RespType](http.DefaultClient, "http://localhost:8080/file", http.MethodPost, nil, "test_ng.txt")
-		f, err := os.OpenFile("tmp/test.txt", os.O_RDONLY, 0644)
-		fstat, _ := f.Stat()
-		buf := make([]byte, fstat.Size())
+		//f, err := os.OpenFile("tmp/test.txt", os.O_RDONLY, 0644)
+		f := strings.NewReader(FILE_STRING)
+		//fstat, _ := f.Stat()
+		buf := make([]byte, f.Size())
 		f.Read(buf)
 		t.Logf("[CLIENT] File: %s\n", string(buf))
+
+		//defer f.Close()
+		_, err := f.Seek(0, io.SeekStart)
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer f.Close()
-		f.Seek(0, io.SeekStart)
 		resp, err := handler(ReqType{
 			Test: f,
 		})

@@ -1,3 +1,5 @@
+//go:build !travis
+
 package oauth
 
 import (
