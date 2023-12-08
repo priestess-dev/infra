@@ -71,25 +71,6 @@ func MultipartFormRequestProcessor[ReqT interface{}](r *http.Request, raw ReqT, 
 				if err != nil {
 					return err
 				}
-				//switch t := field.Interface().(type) {
-				//case *os.File:
-				//	_, err := io.Copy(part, t)
-				//	if err != nil {
-				//		return err
-				//	}
-				//case *bytes.Buffer:
-				//	_, err := io.Copy(part, t)
-				//	if err != nil {
-				//		return err
-				//	}
-				//case io.Reader:
-				//	_, err := io.Copy(part, t)
-				//	if err != nil {
-				//		return err
-				//	}
-				//default:
-				//	return fmt.Errorf("unsupported type: %s", field.Type().String())
-				//}
 				_, err = io.Copy(part, field.Interface().(io.Reader))
 				if err != nil {
 					return err
